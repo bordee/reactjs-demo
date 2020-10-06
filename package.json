@@ -1,0 +1,44 @@
+{
+  "name": "reactjs-demo",
+  "version": "0.0.1",
+  "description": "ReactJS demo app",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "webpack",
+    "start": "webpack-dev-server --mode development",
+    "test": "echo \"test\";"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bordee/reactjs-demo.git"
+  },
+  "keywords": [
+    "reactjs",
+    "demo"
+  ],
+  "author": "bordee",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bordee/reactjs-demo/issues"
+  },
+  "homepage": "https://github.com/bordee/reactjs-demo#readme",
+  "dependencies": {
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.11.6",
+    "@babel/core": "^7.11.6",
+    "@babel/preset-env": "^7.11.5",
+    "@babel/preset-react": "^7.10.4",
+    "babel-loader": "^8.1.0",
+    "css-loader": "^1.0.1",
+    "file-loader": "^6.1.0",
+    "html-webpack-plugin": "^4.5.0",
+    "mini-css-extract-plugin": "^0.11.3",
+    "style-loader": "^0.23.1",
+    "webpack": "^4.44.2",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
+  }
+}
