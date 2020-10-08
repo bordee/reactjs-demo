@@ -1,10 +1,15 @@
 import React, { Component } from "react";
+import { Switch, Route, Router } from "react-router-dom";
+import { createBrowserHistory } from "history";
 
 import Error from "./Error";
 import HttpClient from "./HttpClient";
 import DetailsPopup from "./DetailsPopup";
 
 import MovieSearch from "./pages/MovieSearch";
+import RelatedMovies from "./pages/RelatedMovies";
+
+let BrowserHistory = createBrowserHistory();
 
 export default class App extends Component {
 
@@ -13,11 +18,14 @@ export default class App extends Component {
 
         this.state = {
             /** @TODO load values from config file... */
-            apiKey: "ec3d5572280f99024a448611a8c4bb25",
-            tmdbUrl: "https://api.themoviedb.org/3/search/movie",
+            tmdbApiKey: "ec3d5572280f99024a448611a8c4bb25",
+            tmdbSearchUrl: "https://api.themoviedb.org/3/search/movie",
+            tmdbRelatedUrl: "https://api.themoviedb.org/3/movie/{movie_id}/similar",
             wikipediaUrl: "https://en.wikipedia.org/w/api.php",
             searchText: "",
             detailsData: undefined,
+            movies: {},
+            relatedMovies: undefined,
             error: undefined,
             isRequestVerbose: true,
             requestUrl: "",
@@ -30,13 +38,16 @@ export default class App extends Component {
             requestOptions: {},
             requestCallback: undefined
         };
+
+        this.detailsCloseClicked = this.detailsCloseClicked.bind(this);
+        this.handleMovieSelect = this.handleMovieSelect.bind(this);
     }
 
     errorClicked() {
         this.setState({ error: undefined });
     }
 
-    detailsClicked() {
+    detailsCloseClicked() {
         this.setState({ detailsData: undefined });
     }
 
@@ -68,12 +79,49 @@ export default class App extends Component {
         }
 
         this.triggerRequest(
-            this.state.tmdbUrl,
+            this.state.tmdbSearchUrl,
             {
-                api_key: this.state.apiKey,
+                api_key: this.state.tmdbApiKey,
                 query
             },
             this.tmdbRequestSuccessCallback.bind(this)
+        );
+    }
+
+    handleMovieSelect(tmdbData) {
+        if (
+            !tmdbData
+            || !tmdbData.id
+        ) {
+            console.error("handleMovieSelect", tmdbData);
+            return;
+        }
+
+        this.triggerRequest(
+            this.state.wikipediaUrl,
+            {
+                action: "opensearch",
+                origin: "*",
+                search: tmdbData.title
+            },
+            (response) => this.wikiRequestSuccessCallback(response, tmdbData),
+        );
+    }
+
+    loadRelatedMovies(tmdbData) {
+        if (
+            !tmdbData
+            || !tmdbData.id
+        ) {
+            return;
+        }
+
+        this.triggerRequest(
+            this.state.tmdbRelatedUrl.replace("{movie_id}", tmdbData.id),
+            {
+                api_key: this.state.tmdbApiKey
+            },
+            this.loadRelatedMoviesSuccessCallback.bind(this),
         );
     }
 
@@ -101,25 +149,6 @@ export default class App extends Component {
         });
     }
 
-    handleMovieSelect(tmdbData) {
-        if (
-            !tmdbData
-            || !tmdbData.id
-        ) {
-            return;
-        }
-
-        this.triggerRequest(
-            this.state.wikipediaUrl,
-            {
-                action: "opensearch",
-                origin: "*",
-                search: tmdbData.title
-            },
-            (response) => this.wikiRequestSuccessCallback(response, tmdbData),
-        );
-    }
-
     wikiRequestSuccessCallback(response, tmdbData) {
         if (
             !response.body
@@ -133,6 +162,22 @@ export default class App extends Component {
                 wikiData: response.body,
                 tmdbData
             }
+        });
+    }
+
+    loadRelatedMoviesSuccessCallback(response) {
+        if (!response.body.total_results) {
+            return this.handleRequestError("No results found, please try again.");
+        }
+
+        this.setState({
+            requestUrl: "",
+            requestData: {},
+            requestSuccessCallback: undefined,
+            relatedMovies: response.body.results.reduce((a, e) => {
+                a[e.id] = e;
+                return a;
+            }, {})
         });
     }
 
@@ -168,16 +213,31 @@ export default class App extends Component {
                 error={this.state.error}
                 onClick={this.errorClicked.bind(this)}
             />
-            <DetailsPopup
-                data={this.state.detailsData}
-                onClick={this.detailsClicked.bind(this)}
-            />
-            <MovieSearch
-                searchText={this.state.searchText}
-                searchCallback={this.handleMovieSearch.bind(this)}
-                movies={this.state.movies}
-                selectCallback={this.handleMovieSelect.bind(this)}
-            />
+            <Router history={BrowserHistory}>
+                <Switch>
+                    <Route path="/related/:movie_id" render={(props) =>
+                        <RelatedMovies {...props}
+                            movies={this.state.relatedMovies}
+                            selectCallback={this.handleMovieSelect}
+                            loadRelatedMovies={this.loadRelatedMovies.bind(this)}>
+                            <DetailsPopup  {...props}
+                                data={this.state.detailsData}
+                                onCloseClick={this.detailsCloseClicked}/>
+                        </RelatedMovies>
+                    }/>
+                    <Route path="*" render={(props) =>
+                        <MovieSearch {...props}
+                            searchText={this.state.searchText}
+                            searchCallback={this.handleMovieSearch.bind(this)}
+                            movies={this.state.movies}
+                            selectCallback={this.handleMovieSelect}>
+                            <DetailsPopup  {...props}
+                                data={this.state.detailsData}
+                                onCloseClick={this.detailsCloseClicked}/>
+                        </MovieSearch>
+                    }/>
+                </Switch>
+            </Router>
         </div>);
     }
 }

@@ -32,6 +32,7 @@ module.exports = {
         filename: "app.js"
     },
     devServer: {
+        historyApiFallback: true,
         contentBase: path.join(__dirname, "www/"),
         port: 8080,
         publicPath: "http://localhost:8080/"

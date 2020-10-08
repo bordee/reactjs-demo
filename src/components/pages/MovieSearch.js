@@ -11,13 +11,14 @@ export default class MovieSearch extends Component {
 
     render() {
         return (<div className="search-container page">
+            {this.props.children}
             <SearchForm
                 defaultValue={this.props.searchText}
                 submitCallback={this.props.searchCallback}
             />
             <MovieList
                 movies={this.props.movies}
-                selectCallback={this.props.selectCallback.bind(this)}
+                selectCallback={this.props.selectCallback}
             />
         </div>);
     }
