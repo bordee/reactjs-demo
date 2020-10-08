@@ -19,9 +19,14 @@ export default class Error extends Component {
         }
     }
 
+    handleClick(e) {
+        e.preventDefault();
+        this.props.onClick && this.props.onClick(e);
+    }
+
     render() {
         return this.props.error
-            ? (<div className="error" onClick={this.props.onClick}>
+            ? (<div className="error clickable" onClick={this.handleClick.bind(this)}>
                 {this.errorToMessage(this.props.error)}
             </div>)
             : "";

@@ -11,8 +11,8 @@
 }
 
 #app-container {
-    position: relative;
-    margin: 0.1em;
+    position: absolute;
+    margin: 0;
     padding: 5px;
     top: 5%;
     left: 20%;
@@ -28,30 +28,57 @@
     background-color: #DFDFDF;
 }
 
+h1 {
+    font-size: 1.3em;
+}
+
+div {
+    padding: 2px 0  2px 0;
+}
+
+.page {
+}
+
 .loader {
     position: absolute;
     top: 48%;
     left: 30%;
     width: 40%;
     padding: 5px;
-    font-family: Lucida Console;
+    font-family: monospace;
     background-color: #FAFAFA;
     border: 1px solid black;
     box-shadow: 2px 4px #A0A0A0;
 }
 
 .error {
+    position: absolute;
+    z-index: 10;
+    top: 38%;
+    left: 20%;
+    width: 60%;
+    font-family: monospace;
     padding: 5px;
     background-color: #FF0000;
     color: #88FFFF;
     border: 1px dotted yellow;
 }
-.error:hover {
+
+.clickable:hover {
     cursor: pointer;
 }
 
+td.clickable:hover {
+    background-color: #FAFAFA;
+}
+
 .search-container {
-    padding-top: 25px;
+    position: relative;
+    height: 85%;
+    text-align: center;
+}
+
+.search-form {
 }
 
 .search-input {
@@ -60,6 +87,66 @@
 
 .search-button {
     padding: 5px;
+}
+
+.movie-list {
+    position: relative;
+    overflow-y: auto;
+    height: 80%;
+}
+
+.movie-list > table {
+    display: block;
+    width: 100%;
+}
+
+.movie-list > table > thead > tr > td, .movie-list > table > tbody > tr > td {
+    width: 40%;
+}
+
+.movie-list > table > thead > tr {
+    font-weight: bold;
+}
+
+.details-popup {
+    position: absolute;
+    z-index: 5;
+    top: 15%;
+    left: 12%;
+    width: 76%;
+    height: 80%;
+    padding: 5px;
+    background-color: #FDFDFD;
+    border: 1px solid black;
+    box-shadow: 2px 4px #A0A0A0;
+}
+
+.details-scrolled {
+    position: relative;
+    height: 80%;
+    overflow: auto;
+}
+
+.details-name {
+    font-weight: bold;
+}
+
+.details-name {
+    font-family: monospace;
+    text-align: left;
+}
+
+.details-data {
+    padding-bottom: 5px;
+    height: 20px;
+}
+
+.details-movie-description {
+    height: 100%;
+}
+
+.details-wiki-links {
+    height: 100%;
 }
 
 @media (min-width: 1024px) {
@@ -88,5 +175,10 @@
     #app-container {
         left: 2%;
         min-width: 90%;
+    }
+}
+
+@media (max-height: 568px) {
+    .movie-list {
     }
 }

@@ -9,17 +9,16 @@ export default class HttpClient extends Component {
         super(props);
 
         this.state = {
-            options: Object.assign({
+            optionsDefault: {
                 method: "get",
                 accept: "application/json",
                 headers: {},
                 timeout: 5000,
-            }, this.props.options)
+            }
         };
     }
 
     requestCallback({error, result, loading}) {
-        // console.log("response error:", error, ", result: ", result, ", loading: ", loading);
         switch (true) {
             case !!error:
                 this.props.errorCallback
@@ -28,28 +27,35 @@ export default class HttpClient extends Component {
             case loading:
                 return <Loader/>;
             default:
-                this.setState(
-                    { requestUrl: "" },
-                    () => this.props.successCallback
-                        && this.props.successCallback(result)
-                );
+                this.props.successCallback
+                    && setTimeout(() => this.props.successCallback(result), 1);
                 return null;
         }
     }
 
     render() {
-        return this.props.url && this.props.data
-            ? (<Request
-                url={this.props.url}
-                method={this.state.options.method}
-                accept={this.state.options.accept}
-                headers={this.state.options.headers}
-                verbose={this.state.isRequestVerbose}
-                query={("get" === this.state.options.method) ? this.props.data : ""}
-                send={("post" === this.state.options.method) ? this.props.data : ""}
-            >
-                {this.requestCallback.bind(this)}
-            </Request>)
-            : "";
+        if (
+            !this.props.url
+            || !this.props.data
+        ) {
+            return "";
+        }
+
+        let options = Object.assign(
+            this.state.optionsDefault,
+            this.props.options
+        );
+
+        return  (<Request
+            url={this.props.url}
+            method={options.method}
+            accept={options.accept}
+            headers={options.headers}
+            verbose={this.state.isRequestVerbose}
+            query={("get" === options.method) ? this.props.data : ""}
+            send={("post" === options.method) ? this.props.data : ""}
+        >
+            {this.requestCallback.bind(this)}
+        </Request>);
     }
 }
